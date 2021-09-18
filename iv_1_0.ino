@@ -1263,8 +1263,8 @@ const byte mem[] PROGMEM = {
   //_ISREAL, _1, _EQ, _IF, _9, _0, _ADD, _ELSE, _PI, _2, _DIV, _ADD, _THEN, _SIN, _END, //8 COS cos(x)=sqrt(1-sin(z)*sin(z)) cos(x)=sin(x+90)
   _ISREAL, _1, _EQ, _IF, _9, _0, _SWAP, _SUB, _ELSE, _PI, _2, _DIV, _ADD, _THEN, _SIN, _END, //8 COS cos(x)=sqrt(1-sin(z)*sin(z)) cos(x)=sin(90-x)
   _DUP, _SIN, _SWAP, _COS, _DIV, _END, //9 TAN tan(z)=sin(z)/cos(z)
-  _SWAP, _LN, _MULT, _EXP, _END, //10 POW a^b=exp(b*ln(a))
-  _1, _SWAP, _E, _END, //11 POW10
+  _SWAP, _DUP, _0, _EQ, _IF, _DROP, _0, _ELSE, _LN, _MULT, _EXP, _THEN, _END,// POW a^b=exp(b*ln(a)), 0^x must be =0...
+  _1, _0, _LN, _MULT, _EXP, _END, //11 POW10 should work with real numbers also....
   _LN, _1, _0, _LN, _DIV, _END, //12 LOG log(z)=ln(z)/ln(10)
 
   _DUP, _DUP, _DUP, _MULT, _NEG, _1, _ADD, _SQRT, //13 ASIN: asin(z) = -i*ln(i*z+sqrt(1-z*z))
@@ -1459,7 +1459,6 @@ const char c80[] PROGMEM = "OR";
 //const char c81[] PROGMEM = "OVR";
 const char c82[] PROGMEM = "ABS";
 const char c83[] PROGMEM = ",#"; // SQRT
-const char c84[] PROGMEM = "COS";
 const char c85[] PROGMEM = "TAN";
 const char c86[] PROGMEM = "POW";
 const char c87[] PROGMEM = "10^";
@@ -2783,7 +2782,7 @@ void loop() {
               issetusr = false; ismenu = ismenusetusr = true;
             }
             else if (isprgdict) { // Go back to prgedit
-              prgstepins(tmp);
+              prgstepins(cmdsort[tmp]); //sorting necessary, otherwise wrong commands in PRG-mode
               isprgdict = false; isprgedit = true;
             }
             else { // Execute command directly
